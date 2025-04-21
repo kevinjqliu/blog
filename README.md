@@ -9,3 +9,5 @@ quarto preview
 
 quarto publish gh-pages
 ```
+
+https://kevinjqliu.github.io/blog/
