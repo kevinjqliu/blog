@@ -1,19 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
-    <loc>https://kevinjqliu.github.io/blog/posts/welcome/index.html</loc>
-    <lastmod>2025-04-21T20:05:02.608Z</lastmod>
-  </url>
-  <url>
-    <loc>https://kevinjqliu.github.io/blog/about.html</loc>
-    <lastmod>2025-04-21T20:05:02.607Z</lastmod>
+    <loc>https://kevinjqliu.github.io/blog/posts/tpchgen/index.html</loc>
+    <lastmod>2025-04-21T23:20:54.950Z</lastmod>
   </url>
   <url>
     <loc>https://kevinjqliu.github.io/blog/index.html</loc>
-    <lastmod>2025-04-21T20:05:02.607Z</lastmod>
+    <lastmod>2025-04-21T23:20:54.950Z</lastmod>
   </url>
   <url>
-    <loc>https://kevinjqliu.github.io/blog/posts/post-with-code/index.html</loc>
-    <lastmod>2025-04-21T20:05:02.608Z</lastmod>
+    <loc>https://kevinjqliu.github.io/blog/about.html</loc>
+    <lastmod>2025-04-21T23:20:54.950Z</lastmod>
   </url>
 </urlset>

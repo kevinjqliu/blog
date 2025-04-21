@@ -1,10 +1,38 @@
 [
   {
-    "objectID": "posts/welcome/index.html",
-    "href": "posts/welcome/index.html",
-    "title": "Welcome To My Blog",
+    "objectID": "posts/tpchgen/index.html",
+    "href": "posts/tpchgen/index.html",
+    "title": "tpchgen: Distributing a Rust Binary via Python Using Maturin",
     "section": "",
-    "text": "This is the first post in a Quarto blog. Welcome!\n\nSince this post doesn’t specify an explicit image, the first image in the post will be used in the listing page of posts."
+    "text": "I’ve been interested in learning more about the Rust and Python ecosystems, particularly how the two can work together. For PyIceberg, we see a lot value in “pushing down” certain functions to the Rust layer. For example, partition transforms can be computed much more efficiently in Rust.\nI also see a lot of value in using Python as a distribution layer for Rust programs. Most computers come with Python pre-installed, making pip install a widely accessible way to distribute software. In contrast, distributing Rust programs can be more complex, often requiring the Rust toolchain or hosting the binary somewhere (e.g., Homebrew).\nBy combining the best of both worlds, we can write efficient, high-performance programs in Rust and distribute them easily through Python. Projects like pydantic, uv, and ruff are great examples of this pattern.\nI had a chance to apply this approach in the tpchgen-rs project and shipped the tpchgen-cli package on PyPI."
+  },
+  {
+    "objectID": "posts/tpchgen/index.html#generating-tpc-h-dataset",
+    "href": "posts/tpchgen/index.html#generating-tpc-h-dataset",
+    "title": "tpchgen: Distributing a Rust Binary via Python Using Maturin",
+    "section": "Generating TPC-H dataset",
+    "text": "Generating TPC-H dataset\nRecently, I discovered the tpchgen-rs project, where several members of the Apache DataFusion community collaborated to rewrite dbgen in Rust. For more context, check out the excellent post tpchgen-rs World’s fastest open source TPC-H data generator, written in Rust, which covers the entire journey.\ndbgen is difficult to run by modern standards. I think the easiest way to use it today is through a Docker container.\nThe next best option is DuckDB’s TPC-H extension which generates all 8 TPC-H tables in-memory. These tables can then be exported to various formats such as csv or parquet. However, DuckDB’s dbgen takes a lot of time and resources, especially at higher scale factors. Here’s a table of scale factor compared to the storage size, processing time, and memory usage required to generate those datasets.\n\nFor SF100, DuckDB requires 26GB of storage, 17 minutes, and 71GB of memory. For SF3000, this becomes 796GB of storage, 8 hours and 30 minutes, and 1799GB of memory!!\nIn contrast, tpchgen rewrote the entire dbgen in Rust and ensures the same byte-for-byte output as the original implementation. It also introduced several performance optimizations for the data generation process. These improvements make it feasible to run large scale factors on my local Mac laptop.\nFor example, I can run SF1000.\n➜  time tpchgen-cli -s 1000 --format=parquet --stdout &gt; /dev/null\n\ntpchgen-cli -s 1000 --format=parquet --stdout &gt; /dev/null  6026.24s user 195.72s system 738% cpu 14:02.42 total\nDuckDB would definitely OOM since I don’t have 647GB of memory :("
+  },
+  {
+    "objectID": "posts/tpchgen/index.html#shipping-tpchgen-cli-to-python",
+    "href": "posts/tpchgen/index.html#shipping-tpchgen-cli-to-python",
+    "title": "tpchgen: Distributing a Rust Binary via Python Using Maturin",
+    "section": "Shipping tpchgen-cli to Python",
+    "text": "Shipping tpchgen-cli to Python\nFor such an awesome tool, I wanted to make it available to more users. And the best way to do that is through the python ecosystem. I also wanted an excuse to explore the rust&lt;&gt;python integration and maturin.\nThe goal is to make tpchgen-cli available in pypi so I can just do pip install tpchgen-cli. This will install a python executable and make tpchgen-cli available on the command line.\nFor the end users, this is what the workflow looks like:\npip install tpchgen-cli\ntpchgen-cli -h          # prints the help message\ntpchgen-cli             # generates all 8 tpch tables\n\nFirst Try\nI have some familiarly with rust&lt;&gt;python binding and maturin. My first instinct is to export the rust functions as python bindings, using pyo3 decorators. Then, create a python package using maturin. And finally, create a python executable to run the python bindings.\nI didn’t want to recreate the arg parsing logic in python. So I opted to export rust’s Cli parser’s main function, with the goal of just passing the python args to it.\nThis required a bunch of tinkering to make sure everything is in place. It worked but wasn’t pretty. Generally, its not a good idea to export the main.rs functions and Cargo will emit a warning about it. But hey, it works…\nHere’s the PR that clobbered everything together, https://github.com/clflushopt/tpchgen-rs/pull/119.\n\n\nSecond Try\nWhile reading through the maturin user guide, I found an interesting section about bin, https://www.maturin.rs/bindings#bin.\n\nMaturin also supports distributing binary applications written in Rust as Python packages using the bin bindings. Binaries are packaged into the wheel as “scripts” and are available on the user’s PATH (e.g. in the bin directory of a virtual environment) once installed.\nNote: Maturin does not automatically detect bin bindings. You must specify them via either command line with -b bin or in pyproject.toml.\n\nThis is exactly what I wanted… Thanks maturin. I just wanted to repackage the rust bin into python executable/script.\nThe only extra config I had to specify was this in the pyproject.toml:\n[tool.maturin]\nbindings = \"bin\"  # this makes maturin treat it as a binary crate (not a library)\nHere’s the final PR that shipped the python package, https://github.com/clflushopt/tpchgen-rs/pull/121.\nThe hardest part of the PR was getting the Github Action to publish to pypi correctly… Having worked with Github Actions a few times, this process can definitely be a lot better. But that’s a story for another day."
+  },
+  {
+    "objectID": "posts/tpchgen/index.html#fin",
+    "href": "posts/tpchgen/index.html#fin",
+    "title": "tpchgen: Distributing a Rust Binary via Python Using Maturin",
+    "section": "Fin",
+    "text": "Fin\nThe tpchgen-cli package is now available on pypi, https://pypi.org/project/tpchgen-cli/. This package will also be automatically updated when the underlying rust binary is updated, since its just a wrapper.\nTry it out:\npip install tpchgen-cli\nwhich tpchgen-cli\n# create a sf10 tpch dataset in parquet format with zstd compression\ntpchgen-cli --scale-factor 10 --output-dir tpch_sf10 --format parquet --parquet-compression 'zstd(1)'\nSpecial thanks to @clflushopt, @alamb, and @scsmithr for creating the tpchgen-rs library."
+  },
+  {
+    "objectID": "index.html",
+    "href": "index.html",
+    "title": "blog",
+    "section": "",
+    "text": "tpchgen: Distributing a Rust Binary via Python Using Maturin\n\n\n\n\n\n\ncode\n\n\ntpch\n\n\nrust\n\n\npython\n\n\nmaturin\n\n\npyo3\n\n\n\nDistributing Rust with Python\n\n\n\n\n\nApr 21, 2025\n\n\n\n\n\n\nNo matching items"
   },
   {
     "objectID": "about.html",
@@ -12,19 +40,5 @@
     "title": "Kevin Liu’s Blog",
     "section": "",
     "text": "Random notes to myself.\nInspired by Simon Willison’s link blog and Xiangpeng’s excellent engineering blog"
-  },
-  {
-    "objectID": "index.html",
-    "href": "index.html",
-    "title": "blog",
-    "section": "",
-    "text": "Post With Code\n\n\n\n\n\n\nnews\n\n\ncode\n\n\nanalysis\n\n\n\n\n\n\n\n\n\nApr 21, 2025\n\n\nHarlow Malloc\n\n\n\n\n\n\n\n\n\n\n\n\nWelcome To My Blog\n\n\n\n\n\n\nnews\n\n\n\n\n\n\n\n\n\nApr 18, 2025\n\n\nTristan O’Malley\n\n\n\n\n\n\nNo matching items"
-  },
-  {
-    "objectID": "posts/post-with-code/index.html",
-    "href": "posts/post-with-code/index.html",
-    "title": "Post With Code",
-    "section": "",
-    "text": "This is a post with executable code."
   }
 ]
