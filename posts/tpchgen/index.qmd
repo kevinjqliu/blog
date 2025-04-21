@@ -4,6 +4,9 @@ date: "2025-04-21"
 categories: [code, tpch, rust, python, maturin, pyo3]
 description: "Distributing Rust with Python"
 toc: true
+comments:
+  giscus: 
+    repo: kevinjqliu/blog
 ---
 
 I’ve been interested in learning more about the Rust and Python ecosystems, particularly how the two can work together. For [PyIceberg](https://py.iceberg.apache.org/), we see a lot value in “pushing down” certain functions to the Rust layer. For example, partition transforms can be computed much more efficiently in Rust.
