@@ -1,0 +1,23 @@
+project:
+  type: website
+
+website:
+  title: "Kevin Liu's blog"
+  navbar:
+    right:
+      - about.qmd
+      - icon: github
+        href: https://github.com/kevinjqliu
+      - icon: linkedin
+        href: https://linkedin.com/in/kevinjqliu
+      - icon: twitter
+        href: https://twitter.com/kevinjqliu
+format:
+  html:
+    theme:
+      - cosmo
+      - brand
+    css: styles.css
+
+
+

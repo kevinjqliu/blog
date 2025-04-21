@@ -1,0 +1,21 @@
+---
+title: "Kevin Liu's Blog"
+image: profile.jpg
+about:
+  template: jolla
+  links:
+    - icon: twitter
+      text: Twitter
+      href: https://twitter.com/kevinjqliu
+    - icon: linkedin
+      text: LinkedIn
+      href: https://linkedin.com/in/kevinjqliu
+    - icon: github
+      text: Github
+      href: https://github.com/kevinjqliu
+
+---
+
+Random notes to myself. 
+
+Inspired by [Simon Willison’s link blog](https://simonwillison.net/2024/Dec/22/link-blog/) and [Xiangpeng's excellent engineering blog](https://blog.xiangpeng.systems/)
